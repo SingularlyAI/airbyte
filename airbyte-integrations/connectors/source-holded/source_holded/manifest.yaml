@@ -1,0 +1,80 @@
+version: 0.30.1
+type: DeclarativeSource
+check:
+  type: CheckStream
+  stream_names:
+    - Produts
+streams:
+  - type: DeclarativeStream
+    name: Produts
+    primary_key:
+      - id
+    schema_loader:
+      type: InlineSchemaLoader
+      schema: {}
+    retriever:
+      type: SimpleRetriever
+      requester:
+        type: HttpRequester
+        url_base: https://api.holded.com/api/invoicing/v1
+        path: products
+        http_method: GET
+        request_parameters: {}
+        request_headers: {}
+        request_body_json: {}
+        authenticator:
+          type: ApiKeyAuthenticator
+          header: key
+          api_token: '{{ config[''api_key''] }}'
+      record_selector:
+        type: RecordSelector
+        extractor:
+          type: DpathExtractor
+          field_path: []
+      paginator:
+        type: NoPagination
+  - type: DeclarativeStream
+    name: Payments
+    primary_key:
+      - id
+    schema_loader:
+      type: InlineSchemaLoader
+      schema: {}
+    retriever:
+      type: SimpleRetriever
+      requester:
+        type: HttpRequester
+        url_base: https://api.holded.com/api/invoicing/v1
+        path: payments
+        http_method: GET
+        request_parameters: {}
+        request_headers: {}
+        request_body_json: {}
+        authenticator:
+          type: ApiKeyAuthenticator
+          header: key
+          api_token: '{{ config[''api_key''] }}'
+      record_selector:
+        type: RecordSelector
+        extractor:
+          type: DpathExtractor
+          field_path: []
+      paginator:
+        type: NoPagination
+spec:
+  connection_specification:
+    $schema: http://json-schema.org/draft-07/schema#
+    type: object
+    required:
+      - api_key
+    properties:
+      name:
+        type: string
+        title: Name
+      api_key:
+        type: string
+        title: API Key
+        airbyte_secret: true
+    additionalProperties: true
+  documentation_url: https://example.org
+  type: Spec
